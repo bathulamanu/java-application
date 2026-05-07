@@ -1,15 +1,22 @@
-# STEP 1 - Build JAR
+# BUILD STAGE
 FROM maven:3.9.6-eclipse-temurin-21 AS builder
 
 WORKDIR /app
 
+# copy pom first
 COPY pom.xml .
+
+# download dependencies first (cached)
+RUN mvn dependency:go-offline
+
+# copy source
 COPY src ./src
 
+# build
 RUN mvn clean package -DskipTests
 
 
-# STEP 2 - Run application
+# RUN STAGE
 FROM eclipse-temurin:21-jdk
 
 WORKDIR /app
