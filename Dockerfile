@@ -3,17 +3,16 @@ FROM maven:3.9.6-eclipse-temurin-21 AS builder
 
 WORKDIR /app
 
-# copy pom first
 COPY pom.xml .
 
-# download dependencies first (cached)
-RUN mvn dependency:go-offline
+# CACHE MAVEN
+RUN --mount=type=cache,target=/root/.m2 \
+    mvn dependency:go-offline
 
-# copy source
 COPY src ./src
 
-# build
-RUN mvn clean package -DskipTests
+RUN --mount=type=cache,target=/root/.m2 \
+    mvn clean package -DskipTests
 
 
 # RUN STAGE
